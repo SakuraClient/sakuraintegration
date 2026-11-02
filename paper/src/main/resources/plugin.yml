@@ -1,0 +1,17 @@
+name: SakuraIntegration
+version: '${version}'
+main: com.sakuraclient.integration.paper.SakuraIntegrationPlugin
+api-version: '1.13'
+description: Talks to the Sakura players on your server. Turn Sakura mods off, see who plays on Sakura, and verify your address.
+website: https://sakuraclient.com
+authors: [Sakura]
+softdepend: [PlaceholderAPI]
+commands:
+  sakura:
+    description: Sakura Integration
+    usage: /sakura [status|players|verify <address>|reload]
+    permission: sakura.admin
+permissions:
+  sakura.admin:
+    description: Use /sakura
+    default: op

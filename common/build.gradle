@@ -1,0 +1,13 @@
+dependencies {
+    api project(':api')
+    // Every platform ships Gson; 2.8.0 is the oldest (Spigot 1.13).
+    compileOnly 'com.google.code.gson:gson:2.8.0'
+
+    testImplementation 'com.google.code.gson:gson:2.8.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}

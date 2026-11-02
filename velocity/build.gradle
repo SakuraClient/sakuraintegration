@@ -1,0 +1,30 @@
+dependencies {
+    compileOnly 'com.velocitypowered:velocity-api:3.3.0-SNAPSHOT'
+    annotationProcessor 'com.velocitypowered:velocity-api:3.3.0-SNAPSHOT'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    // Velocity 3.3 runs on Java 17.
+    options.release = 17
+}
+
+// @Plugin needs the version as a constant.
+def buildInfo = layout.buildDirectory.dir('generated/sources/buildinfo')
+def buildInfoTask = tasks.register('buildInfo') {
+    inputs.property 'version', project.version
+    outputs.dir buildInfo
+    def version = project.version
+    doLast {
+        def file = buildInfo.get().file('com/sakuraclient/integration/velocity/BuildInfo.java').asFile
+        file.parentFile.mkdirs()
+        file.text = """package com.sakuraclient.integration.velocity;
+
+final class BuildInfo {
+    static final String VERSION = "${version}";
+
+    private BuildInfo() {}
+}
+"""
+    }
+}
+sourceSets.main.java.srcDir(buildInfoTask)

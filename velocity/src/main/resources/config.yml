@@ -1,0 +1,14 @@
+# Sakura Integration (Velocity)
+# https://github.com/SakuraClient/sakuraintegration
+
+# Sakura mods to turn off for everyone on this network. A mod is off outright
+# while the player is connected and comes back when they leave. Ids are in the
+# README (freelook, minimap, world-map, camera-zoom, light-lens, waypoints, ...).
+# Sakura never lets a server turn off streamer-mode, wellbeing or subtitles.
+disabled-mods: []
+
+# A backend's own list, added to the one above while the player is on it.
+# Names are the ones in velocity.toml's [servers].
+servers: {}
+#  bedwars:
+#    disabled-mods: [freelook, minimap]

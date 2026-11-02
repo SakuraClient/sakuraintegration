@@ -1,0 +1,8 @@
+.gradle/
+build/
+.idea/
+*.iml
+out/
+# A test server's files, never a real server's credentials.
+run/
+credentials.json

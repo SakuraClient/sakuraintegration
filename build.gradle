@@ -1,0 +1,38 @@
+// Sakura Integration: one jar for Paper/Spigot 1.13+, one for Velocity 3.3+.
+// `common` (the wire and the shared logic) and `api` (what other plugins call)
+// are built into both.
+
+subprojects {
+    apply plugin: 'java-library'
+
+    group = 'com.sakuraclient'
+    // CI sets the release's version (1.0.<commits on main - 1>); a local build is a dev one.
+    version = rootProject.findProperty('releaseVersion') ?: '1.0.0-dev'
+
+    repositories {
+        mavenCentral()
+        maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+        maven { url = 'https://repo.extendedclip.com/releases/' }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        // Servers from 1.13 on still run Java 8.
+        options.release = 8
+        options.compilerArgs += ['-Xlint:-options']
+    }
+}
+
+// A platform jar carries common and api inside it.
+configure([project(':paper'), project(':velocity')]) {
+    dependencies {
+        implementation project(':common')
+        implementation project(':api')
+    }
+    jar {
+        dependsOn ':common:jar', ':api:jar'
+        from { [project(':common'), project(':api')].collect { it.sourceSets.main.output } }
+        archiveBaseName = 'SakuraIntegration-' + project.name.capitalize()
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}

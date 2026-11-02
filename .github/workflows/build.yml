@@ -1,0 +1,67 @@
+name: Build
+
+# Every push to main is a release: 1.0.<commits on main - 1>, with its jars
+# and the commits since the last one. Pull requests are built and tested only.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Nothing secret ever belongs in this repo.
+      - name: Scan for secrets
+        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.21.2 dir /repo --redact --verbose
+
+      - name: Version
+        id: version
+        run: echo "version=1.0.$(( $(git rev-list --count HEAD) - 1 ))" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build and test
+        run: ./gradlew build --no-daemon -PreleaseVersion=${{ steps.version.outputs.version }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jars
+          path: |
+            paper/build/libs/SakuraIntegration-*.jar
+            velocity/build/libs/SakuraIntegration-*.jar
+
+      - name: Release notes
+        if: github.event_name == 'push'
+        run: |
+          previous=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          {
+            echo "**Paper, Spigot, Purpur and forks (1.13 to the newest):** \`SakuraIntegration-Paper-${{ steps.version.outputs.version }}.jar\`"
+            echo
+            echo "**Velocity:** \`SakuraIntegration-Velocity-${{ steps.version.outputs.version }}.jar\`"
+            echo
+            echo "### Changes"
+            git log --no-merges --pretty='- %s' ${previous:+$previous..}HEAD
+          } > notes.md
+
+      - name: Release
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Sakura Integration ${{ steps.version.outputs.version }}
+          body_path: notes.md
+          make_latest: true
+          files: |
+            paper/build/libs/SakuraIntegration-Paper-*.jar
+            velocity/build/libs/SakuraIntegration-Velocity-*.jar

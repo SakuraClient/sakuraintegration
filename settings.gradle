@@ -1,0 +1,3 @@
+rootProject.name = 'sakuraintegration'
+
+include 'common', 'api', 'paper', 'velocity'

@@ -1,0 +1,17 @@
+# Sakura Integration
+# https://github.com/SakuraClient/sakuraintegration
+
+# Sakura mods to turn off for everyone on this server. A mod is off outright
+# while the player is here and comes back when they leave. Ids are in the
+# README (freelook, minimap, world-map, camera-zoom, light-lens, waypoints, ...).
+# Sakura never lets a server turn off streamer-mode, wellbeing or subtitles.
+disabled-mods: []
+
+# A world with its own list, used instead of the one above while a player is in it.
+worlds: {}
+#  arena:
+#    disabled-mods: [freelook, minimap]
+
+placeholders:
+  # %sakura_badge% shows this for Sakura players, and nothing for anyone else.
+  badge: "✿ "

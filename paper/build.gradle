@@ -1,0 +1,13 @@
+dependencies {
+    // The oldest API we support: anything that compiles here runs on 1.13 to 26.x.
+    // Paper's (not Spigot's) for PaperServerListPingEvent, which verifying needs.
+    compileOnly 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT'
+    compileOnly 'me.clip:placeholderapi:2.11.6'
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('plugin.yml') {
+        expand version: project.version
+    }
+}
