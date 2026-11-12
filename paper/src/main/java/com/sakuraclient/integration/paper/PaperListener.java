@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
-/** The handshake, the answers, and the moments a player's set can change. */
+/** The handshake, the answers, the moments a player's set can change, and a player's game asking for a recording. */
 final class PaperListener implements Listener, PluginMessageListener {
 
     private final SakuraIntegrationPlugin plugin;
@@ -34,6 +34,10 @@ final class PaperListener implements Listener, PluginMessageListener {
         } catch (Wire.WireException e) {
             return; // Not ours to fix: a broken or hostile client.
         }
+        if (m instanceof Wire.RecordingGet) {
+            plugin.recordings().get(player, (Wire.RecordingGet) m);
+            return;
+        }
         if (!(m instanceof Wire.ClientHello)) return;
         Wire.ClientHello hello = (Wire.ClientHello) m;
         // An answer to the network's hello is the proxy's, not ours.
@@ -42,6 +46,7 @@ final class PaperListener implements Listener, PluginMessageListener {
         if (joined != null) {
             plugin.getServer().getPluginManager().callEvent(new SakuraPlayerJoinEvent(player, joined));
         }
+        plugin.recordings().hello(player, hello.features);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -52,5 +57,6 @@ final class PaperListener implements Listener, PluginMessageListener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
         plugin.players().left(event.getPlayer().getUniqueId());
+        plugin.recordings().quit(event.getPlayer().getUniqueId());
     }
 }

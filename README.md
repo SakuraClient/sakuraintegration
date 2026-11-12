@@ -5,6 +5,7 @@ A plugin that lets your server work with [Sakura](https://sakuraclient.com) play
 - **Turn off Sakura mods** you don't want on your server.
 - **See who plays on Sakura.**
 - **Verify your server's address** with Sakura.
+- **Record an arena**, so the players who were in it can watch it again in Sakura's Studio.
 
 It works on **Paper, Spigot, Purpur and other forks from 1.13 to the newest**, and on **Velocity**.
 
@@ -74,6 +75,21 @@ It takes a few seconds and proves to Sakura that this address leads to your serv
 
 Your server's identity is saved in `plugins/SakuraIntegration/credentials.json`. **Keep that file private.**
 
+## Record an arena
+
+```
+/sakura record start radius=6 Bed Wars 4
+/sakura record stop
+```
+
+That records every player and every block in the chunks round you: how they moved, what they held, their hits and deaths, public chat, and every block placed or broken. Record a box of blocks instead with `box=<x1>,<z1>,<x2>,<z2>`, and another world with `world=<name>`. The rest is its name.
+
+When it stops, the players who were in it and play on Sakura get it in Sakura's Studio, where they can watch it from any angle and make a video of it. It reaches them only after it stops, never during a match, and only from your server: nothing is sent anywhere else.
+
+Recordings are kept in `plugins/SakuraIntegration/recordings`, the newest 50 for 14 days. The `recordings` part of the config changes that, who gets them (`participants`, `everyone` or `nobody`) and how fast. A recording holds players' names and skins, their movement and public chat, so keep them as you'd keep your logs.
+
+Servers on 1.17 and later record the server's own clock too, so a player's own recording of the same game lines up with yours to the millisecond.
+
 ## Commands
 
 All need the `sakura.admin` permission (ops have it). On Velocity, use `/sakuravelocity`.
@@ -84,6 +100,12 @@ All need the `sakura.admin` permission (ops have it). On Velocity, use `/sakurav
 | `/sakura players` | Who's on Sakura |
 | `/sakura verify <address>` | Verifies your address |
 | `/sakura reload` | Reloads the config |
+| `/sakura record start [radius=<chunks> \| box=<x1>,<z1>,<x2>,<z2>] [world=<name>] [name]` | Starts recording |
+| `/sakura record stop [id]` | Stops and saves it |
+| `/sakura record mark <words>` | Marks this moment |
+| `/sakura record list` | What's recording, and what's kept |
+
+`sakura.recordings.receive` (everyone has it) decides who can be given recordings.
 
 ## For developers
 
@@ -104,7 +126,7 @@ sakura.player(player.getUniqueId()).ifPresent(SakuraPlayer::clearMods);
 
 ## Privacy
 
-The plugin sends nothing anywhere: no stats, no update checks. It only talks to Sakura when you run `/sakura verify`.
+The plugin sends nothing anywhere: no stats, no update checks. It only talks to Sakura when you run `/sakura verify`. Recordings go only to the players in them, over their own connection to your server.
 
 ## Building
 

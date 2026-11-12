@@ -4,6 +4,7 @@ import com.sakuraclient.integration.api.SakuraIntegration;
 import com.sakuraclient.integration.core.Mods;
 import com.sakuraclient.integration.core.Players;
 import com.sakuraclient.integration.core.Verifier;
+import com.sakuraclient.integration.paper.record.Recordings;
 import com.sakuraclient.integration.wire.Wire;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
@@ -27,11 +28,15 @@ import java.util.UUID;
  * this server turns off: the configuration's (their world's own list, if it
  * has one) and whatever another plugin set for them. It's sent again when
  * they change world or the configuration reloads.
+ *
+ * <p>It also records arenas ({@link Recordings}): every player and block of a box of chunks, offered to the players'
+ * games once the recording stops.
  */
 public final class SakuraIntegrationPlugin extends JavaPlugin implements Players.Platform {
 
     private Players players;
     private Verifier verifier;
+    private Recordings recordings;
     private boolean pingHook;
 
     private volatile Set<String> disabledMods = Collections.emptySet();
@@ -51,6 +56,9 @@ public final class SakuraIntegrationPlugin extends JavaPlugin implements Players
         PaperListener listener = new PaperListener(this);
         getServer().getMessenger().registerIncomingPluginChannel(this, Wire.CHANNEL, listener);
         getServer().getPluginManager().registerEvents(listener, this);
+
+        recordings = new Recordings(this, players::isSakura);
+        recordings.enable();
 
         pingHook = PingHook.available();
         if (pingHook) getServer().getPluginManager().registerEvents(new PingHook(verifier), this);
@@ -77,6 +85,7 @@ public final class SakuraIntegrationPlugin extends JavaPlugin implements Players
 
     @Override
     public void onDisable() {
+        if (recordings != null) recordings.disable();
         SakuraIntegration.Provider.set(null);
         getServer().getServicesManager().unregisterAll(this);
         getServer().getMessenger().unregisterIncomingPluginChannel(this);
@@ -96,6 +105,7 @@ public final class SakuraIntegrationPlugin extends JavaPlugin implements Players
         }
         worldMods = Collections.unmodifiableMap(worlds);
         badge = getConfig().getString("placeholders.badge", "");
+        if (recordings != null) recordings.readConfig(getConfig());
     }
 
     void sendHello(Player p) {
@@ -108,6 +118,10 @@ public final class SakuraIntegrationPlugin extends JavaPlugin implements Players
 
     Verifier verifier() {
         return verifier;
+    }
+
+    Recordings recordings() {
+        return recordings;
     }
 
     boolean canVerify() {

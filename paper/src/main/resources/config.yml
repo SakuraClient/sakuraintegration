@@ -15,3 +15,27 @@ worlds: {}
 placeholders:
   # %sakura_badge% shows this for Sakura players, and nothing for anyone else.
   badge: "✿ "
+
+# Recording an arena: /sakura record start records every player and block of a
+# box of chunks, and once it stops, the players who were in it are offered it in
+# Sakura's Studio. Nothing records until you (or another plugin) start it.
+recordings:
+  # Where they're kept: a folder in this plugin's, or a path of its own. Servers
+  # that share one folder each offer every recording in it.
+  folder: recordings
+  # How many are kept, and for how many days (0: no limit). The oldest go first.
+  keep: 50
+  keep-days: 14
+  # A recording stops by itself after this long.
+  max-minutes: 60
+  # How far round you (or the world's spawn) /sakura record start reaches, in chunks.
+  radius: 8
+  # Who's offered a recording once it stops: participants (everyone who was in
+  # it), everyone, or nobody.
+  offer-to: participants
+  # How fast one player downloads one.
+  download-kib-per-second: 512
+  # How often every chunk is compared with the recording, for changes no event
+  # tells of (commands like /fill, other plugins' blocks), in seconds. Shorter
+  # finds them sooner and costs more: about 0.3 ms a chunk.
+  resync-seconds: 15
