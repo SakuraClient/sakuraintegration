@@ -135,7 +135,3 @@ The plugin sends nothing anywhere: no stats, no update checks. It only talks to 
 ```
 
 The jars end up in `paper/build/libs` and `velocity/build/libs`.
-
-## License
-
-MIT
